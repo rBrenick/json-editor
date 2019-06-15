@@ -78,14 +78,14 @@ QT UTILS END
 
 
 # Tool
-from . import utils as tool_utils
+from json_editor import json_editor_utils as tool_utils
 reload(tool_utils)
 
 DEVELOPMENT_MODE = False
 TESTING_JSON = r"C:\temp\testing.json"
 
 # Load UI
-ui_file_main = os.path.join(os.path.dirname(__file__), "ui", "window.ui")
+ui_file_main = os.path.join(os.path.dirname(__file__), "ui", "json_editor_ui.ui")
 pform_main, pbase_main = load_ui_type(ui_file_main)
 
 
