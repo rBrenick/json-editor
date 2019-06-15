@@ -31,7 +31,7 @@ function SafeRemove
 $USER_DOWNLOADS_FOLDER = "$env:userprofile\Downloads"
 
 $TOOL_GIT_REPO = "https://github.com/rBrenick/json-editor/archive/master.zip" # modify these after uploading the tool
-$UPDATE_PATHS = @("docs", "src", "README.md")
+$UPDATE_PATHS = @("docs", "json_editor", "README.md", "setup.py")
 
 $CURRENT_TOOL_FOLDER = (Get-Item -Path ".").FullName
 $CURRENT_json_editor = (Get-Item -Path ".").Name
