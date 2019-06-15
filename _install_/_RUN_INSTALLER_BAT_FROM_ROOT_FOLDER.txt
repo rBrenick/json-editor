@@ -1,0 +1,14 @@
+#
+Cheeky lil command if you don't want to restart maya the first time
+
+import sys
+tool_path = r"D:\Git\json_editor\src\scripts"
+if tool_path not in sys.path:
+    sys.path.append(tool_path)
+
+from json_editor import json_editor_UI
+json_editor_UI.main()
+
+
+
+
