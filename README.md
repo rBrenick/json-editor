@@ -18,18 +18,16 @@ Requires <a href="https://github.com/mottosso/Qt.py/">Qt.py</a>
 
 # Start the tool
 
-
+**From Maya**
 <pre>
-**# From Maya**
 # Run this script in a python tab
 import json_editor
 json_editor.main()
+</pre>
 
-############################################
-
-# From Standalone
+**From Standlone**
+<pre>
 [TBD]
-
 </pre>
 
 
