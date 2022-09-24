@@ -108,6 +108,7 @@ class DataTreeWidget(QtWidgets.QWidget):
                 "-",
                 {"Move Up": self.action_move_selected_items_up},
                 {"Move Down": self.action_move_selected_items_down},
+                {"Sort Alphabetical": self.sort_selected_items},
                 "-",
             ])
 
@@ -180,7 +181,7 @@ class DataTreeWidget(QtWidgets.QWidget):
         for item in self.get_selected_items():  # type: QtWidgets.QTreeWidgetItem
             item_data = self.get_widget_item_values(item)
             item_key = item.text(lk.col_key)
-            parent = item.parent() if item.parent() else self.tree_widget.invisibleRootItem()
+            parent = self.get_parent(item)
 
             new_item = self.add_data_to_widget(
                 data_key=item_key,
@@ -203,15 +204,31 @@ class DataTreeWidget(QtWidgets.QWidget):
             if item is self.tree_widget.invisibleRootItem():
                 continue
 
-            item_parent = item.parent()
-            if item_parent is None:
-                item_parent = self.tree_widget.invisibleRootItem()
+            item_parent = self.get_parent(item)
             item_parent.removeChild(item)
             fix_list_indices(item_parent)
 
         if self.tree_widget.invisibleRootItem().childCount() == 0:
             # if we've gotten rid of everything do a full clear
             self.action_clear()
+
+    def sort_selected_items(self):
+        selected_items = self.get_selected_items(root_on_empty=False)
+        common_parent_map = {}
+        for selected_item in selected_items:
+            item_parent = self.get_parent(selected_item)
+
+            items_of_parent = common_parent_map.get(item_parent, list())
+            items_of_parent.append(selected_item)
+            common_parent_map[item_parent] = items_of_parent
+
+        for parent, child_items in common_parent_map.items():
+            sorted_children = sorted(child_items, key=lambda x: x.text(lk.col_key))
+            first_child_index = min(parent.indexOfChild(child) for child in child_items)
+            [parent.takeChild(parent.indexOfChild(child)) for child in child_items]
+
+            sorted_children.reverse()
+            [parent.insertChild(first_child_index, sorted_child) for sorted_child in sorted_children]
 
     def action_clear(self):
         self._root_type = None
@@ -253,9 +270,7 @@ class DataTreeWidget(QtWidgets.QWidget):
         # find most common parent type of all selected items
         parent_data_types = []
         for item in selected_items:
-            item_parent = item.parent()
-            if item_parent is None:
-                item_parent = self.tree_widget.invisibleRootItem()
+            item_parent = self.get_parent(item)
 
             parent_data_type = get_data_type(item_parent)
             parent_data_types.append(parent_data_type)
@@ -399,6 +414,12 @@ class DataTreeWidget(QtWidgets.QWidget):
 
         for resolved_parent in resolve_parent_list_items:
             fix_list_indices(resolved_parent)
+
+    def get_parent(self, item):
+        item_parent = item.parent()
+        if item_parent is None:
+            item_parent = self.tree_widget.invisibleRootItem()
+        return item_parent
 
 
 def get_sub_widgets(tree_widget_item):
