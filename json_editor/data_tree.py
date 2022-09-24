@@ -311,10 +311,9 @@ class DataTreeWidget(QtWidgets.QWidget):
             if not merge:
                 parent_item = QtWidgets.QTreeWidgetItem(
                     parent_item,
-                    [data_key, "-------- {} items --------".format(len(data_value))]
+                    [data_key, "-------- {} items --------".format(len(data_value)), data_type_name],
                 )
                 parent_item.setFlags(parent_item.flags() | QtCore.Qt.ItemIsEditable)
-                parent_item.setData(lk.col_type, QtCore.Qt.DisplayRole, data_type_name)
                 return_item = parent_item
 
             for k, v in data_value.items():
@@ -327,14 +326,12 @@ class DataTreeWidget(QtWidgets.QWidget):
                 )
 
         elif isinstance(data_value, lk.list_types):
-
             if not merge:
                 parent_item = QtWidgets.QTreeWidgetItem(
                     parent_item,
-                    [data_key, "-------- {} items --------".format(len(data_value))]
+                    [data_key, "-------- {} items --------".format(len(data_value)), data_type_name],
                 )
                 parent_item.setFlags(parent_item.flags() | QtCore.Qt.ItemIsEditable)
-                parent_item.setData(lk.col_type, QtCore.Qt.DisplayRole, data_type_name)
                 return_item = parent_item
 
             for i, v in enumerate(data_value):
@@ -346,9 +343,8 @@ class DataTreeWidget(QtWidgets.QWidget):
                     key_safety=key_safety,
                 )
         else:
-            widget_item = QtWidgets.QTreeWidgetItem(parent_item, [data_key, str(data_value)])
+            widget_item = QtWidgets.QTreeWidgetItem(parent_item, [data_key, str(data_value), data_type_name])
             # widget_item.setData(lk.col_value, QtCore.Qt.DisplayRole, data_value)
-            widget_item.setData(lk.col_type, QtCore.Qt.DisplayRole, str(data_type_name))
             widget_item.setFlags(widget_item.flags() | QtCore.Qt.ItemIsEditable)
             return_item = widget_item
 
@@ -407,6 +403,21 @@ class DataTreeWidget(QtWidgets.QWidget):
 
 def get_sub_widgets(tree_widget_item):
     return [tree_widget_item.child(i) for i in range(tree_widget_item.childCount())]
+
+
+def get_all_item_descendants(tree_widget_item, item_list=None):
+    if item_list is None:
+        item_list = []
+
+    item_children = get_sub_widgets(tree_widget_item)
+
+    # This list is recursively extended. So mutability comes into play here.
+    item_list.extend(item_children)
+
+    for item_child in item_children:
+        get_all_item_descendants(item_child, item_list)
+
+    return item_list
 
 
 def get_data_as_correct_type(tree_widget_item):

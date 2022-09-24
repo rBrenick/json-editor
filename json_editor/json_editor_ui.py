@@ -3,6 +3,7 @@ import json
 import sys
 import time
 
+from . import batch_name
 from . import data_tree
 from . import json_editor_system as system
 from . import ui_utils
@@ -14,6 +15,18 @@ if not QtWidgets.QApplication.instance():
     from .resources import stylesheets
 
     stylesheets.apply_standalone_stylesheet()
+
+
+class LocalConstants:
+
+    # modify options
+    keys = "Keys"
+    values = "Values"
+    keys_and_values = "Keys & Values"
+    batch_modify_options = [keys_and_values, keys, values]
+
+
+lk = LocalConstants
 
 
 class JsonEditorWidget(QtWidgets.QWidget):
@@ -38,7 +51,7 @@ class JsonEditorWidget(QtWidgets.QWidget):
         self.filter_widget.textEdited.connect(self.filter_data)
 
         self.data_tree_widget = data_tree.DataTreeWidget()
-        # self.batch_modify_widget = batch_name.BatchNameWidget()
+        self.batch_modify_widget = batch_name.BatchNameWidget()
         self.data_tree_widget.data_is_shown.connect(self.data_visibility_state_changed)
 
         self.helper_overlay = HelperMessageOverlay(self.data_tree_widget.tree_widget)
@@ -49,15 +62,15 @@ class JsonEditorWidget(QtWidgets.QWidget):
         ###########################################################
         # JSON editor specific ui
         self.modify_hierarchy = QtWidgets.QCheckBox("Modify Hierarchy")
-        self.modify_hierarchy.setChecked(True)
+        self.modify_hierarchy.setChecked(False)
         self.modify_type_chooser = QtWidgets.QComboBox()
-        self.modify_type_chooser.addItems(["Keys & Values", "Keys", "Values"])
+        self.modify_type_chooser.addItems(lk.batch_modify_options)
         self.modify_rename_button = QtWidgets.QPushButton("Rename")
         self.modify_duplicate_button = QtWidgets.QPushButton("Duplicate")
 
         # connect signals
-        # self.modify_rename_button.clicked.connect(self.modify_rename)
-        # self.modify_duplicate_button.clicked.connect(self.modify_duplicate)
+        self.modify_rename_button.clicked.connect(self.modify_rename)
+        self.modify_duplicate_button.clicked.connect(self.modify_duplicate)
 
         modify_layout = QtWidgets.QHBoxLayout()
         modify_layout.setContentsMargins(0, 0, 0, 0)
@@ -69,16 +82,81 @@ class JsonEditorWidget(QtWidgets.QWidget):
 
         self.main_layout.addWidget(self.path_widget)
         self.main_layout.addWidget(self.filter_widget)
-        # main_splitter = QtWidgets.QSplitter(QtCore.Qt.Vertical)
-        # main_splitter.addWidget(self.data_tree_widget)
-        # main_splitter.addWidget(self.batch_modify_widget)
-        # self.main_layout.addWidget(main_splitter)
         self.main_layout.addWidget(self.data_tree_widget)
-        # self.main_layout.addWidget(self.batch_modify_widget)
-        # self.main_layout.addLayout(modify_layout)
+        self.main_layout.addWidget(self.batch_modify_widget)
+        self.main_layout.addLayout(modify_layout)
         self.setLayout(self.main_layout)
 
         self.path_widget.path_changed.connect(self.load_json)
+
+    def modify_rename(self):
+        modify_keys = self.modify_type_chooser.currentText() in (lk.keys, lk.keys_and_values)
+        modify_values = self.modify_type_chooser.currentText() in (lk.values, lk.keys_and_values)
+
+        items_to_modify = self.data_tree_widget.get_selected_items()
+
+        if self.modify_hierarchy.isChecked():
+            item_descendants = []
+            for item in items_to_modify:
+                item_descendants.extend(data_tree.get_all_item_descendants(item))
+            items_to_modify.extend(item_descendants)
+
+        for item in items_to_modify:
+            if modify_keys:
+                item.setText(
+                    data_tree.lk.col_key,
+                    self.batch_modify_widget.modify_string(item.text(data_tree.lk.col_key))
+                )
+
+            if modify_values and not data_tree.item_supports_children(item):
+                item.setText(
+                    data_tree.lk.col_value,
+                    self.batch_modify_widget.modify_string(item.text(data_tree.lk.col_value))
+                )
+
+    def modify_duplicate(self):
+        modify_keys = self.modify_type_chooser.currentText() in (lk.keys, lk.keys_and_values)
+        modify_values = self.modify_type_chooser.currentText() in (lk.values, lk.keys_and_values)
+
+        for item in self.data_tree_widget.get_selected_items():
+            item_data = self.data_tree_widget.get_widget_item_values(item)
+            item_key = item.text(data_tree.lk.col_key)
+            if modify_keys:
+                item_key = self.batch_modify_widget.modify_string(item_key)
+
+            parent = item.parent() if item.parent() else self.data_tree_widget.tree_widget.invisibleRootItem()
+
+            new_item = self.data_tree_widget.add_data_to_widget(
+                data_key=item_key,
+                data_value=item_data,
+                parent_item=parent,
+                merge=not data_tree.item_supports_children(item),
+                key_safety=True
+            )
+
+            # insert next to the original
+            item_index = parent.indexOfChild(item)
+            parent.takeChild(parent.indexOfChild(new_item))
+            parent.insertChild(item_index + 1, new_item)
+
+            items_to_modify = [new_item]
+            if self.modify_hierarchy.isChecked():
+                items_to_modify.extend(data_tree.get_all_item_descendants(new_item))
+
+            for duped_item in items_to_modify:
+                if modify_keys and duped_item != new_item:  # key has already been modified, so can skip that on root
+                    duped_item.setText(
+                        data_tree.lk.col_key,
+                        self.batch_modify_widget.modify_string(duped_item.text(data_tree.lk.col_key))
+                    )
+
+                if modify_values and not data_tree.item_supports_children(duped_item):
+                    duped_item.setText(
+                        data_tree.lk.col_value,
+                        self.batch_modify_widget.modify_string(duped_item.text(data_tree.lk.col_value))
+                    )
+
+            data_tree.fix_list_indices(parent)
 
     def filter_data(self):
         filter_text = self.filter_widget.text()
@@ -308,6 +386,7 @@ class JsonEditorWindow(ui_utils.ToolWindow):
 def main(refresh=False):
     win = JsonEditorWindow()
     win.main(refresh=refresh)
+    win.resize(800, 800)
 
     if standalone_app:
         ui_utils.standalone_app_window = win
