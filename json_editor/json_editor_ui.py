@@ -361,6 +361,17 @@ class JsonEditorWindow(ui_utils.ToolWindow):
             QtGui.QKeySequence("Alt+Down"),
         )
 
+        edit_menu.addAction(
+            "Sort Alphabetical",
+            self.ui.data_tree_widget.sort_selected_items,
+        )
+
+        edit_menu.addAction(
+            "Select Hierarchy",
+            self.ui.data_tree_widget.select_hierarchy,
+            QtGui.QKeySequence("Ctrl+Down"),
+        )
+
         display_menu = menu_bar.addMenu("Display")
         display_menu.setTearOffEnabled(True)
         display_menu.addAction(

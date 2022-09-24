@@ -230,6 +230,12 @@ class DataTreeWidget(QtWidgets.QWidget):
             sorted_children.reverse()
             [parent.insertChild(first_child_index, sorted_child) for sorted_child in sorted_children]
 
+    def select_hierarchy(self):
+        for item in self.get_selected_items():
+            item_descendants = get_all_item_descendants(item)
+            for item in item_descendants:
+                item.setSelected(True)
+
     def action_clear(self):
         self._root_type = None
         self.tree_widget.clear()
@@ -384,9 +390,7 @@ class DataTreeWidget(QtWidgets.QWidget):
             selected_items.reverse()
 
         for i, item in enumerate(selected_items):  # Find new indices for selected items
-            parent_item = item.parent()
-            if parent_item is None:
-                parent_item = self.tree_widget.invisibleRootItem()
+            parent_item = self.get_parent(item)
 
             was_expanded = item.isExpanded()
 
