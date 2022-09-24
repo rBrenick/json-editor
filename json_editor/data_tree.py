@@ -174,8 +174,11 @@ class DataTreeWidget(QtWidgets.QWidget):
         except ValueError:
             self.status_message("No JSON serializable data could be read from clipboard")
             return
-
-        self.add_data_to_selected(clipboard_data, merge=True)
+            
+        if self._root_type == None:
+            self.set_data(clipboard_data)
+        else:
+            self.add_data_to_selected(clipboard_data, merge=True)
         self.data_is_shown.emit(True)
         
     def action_duplicate_selected_items(self):
