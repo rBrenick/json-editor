@@ -176,7 +176,8 @@ class DataTreeWidget(QtWidgets.QWidget):
             return
 
         self.add_data_to_selected(clipboard_data, merge=True)
-
+        self.data_is_shown.emit(True)
+        
     def action_duplicate_selected_items(self):
         for item in self.get_selected_items():  # type: QtWidgets.QTreeWidgetItem
             item_data = self.get_widget_item_values(item)
