@@ -1,11 +1,16 @@
-# JSON-Editor
-Visual JSON Editor written in Qt
+# json-editor
+Visual JSON Editor written in PySide2.
 
-![JSON-Editor in action](https://raw.githubusercontent.com/rBrenick/JSON-Editor/master/docs/example_image.PNG)
+![tool header image](docs/header_image.png)
 
-# NOTE
-Requires <a href="https://github.com/mottosso/Qt.py/">Qt.py</a>
+# Update
 
+2022-09-24 - Rewrote from scratch
+
+New features:
+- Separated out the data_tree widget to its own thing
+- Better handling of different data structures
+- Remember indentation when saving file
 
 # Install
 
@@ -13,21 +18,25 @@ Requires <a href="https://github.com/mottosso/Qt.py/">Qt.py</a>
 1. Download this package and unzip it in a good location 
     1.B (or git clone it directly if you have git installed)
 2. Run installer.bat (will walk you through some options for install)
-3. Restart Maya
+3. Restart the DCC
 </pre>
 
 # Start the tool
+Run this script in a python tab in maya
 
-**From Maya**
 <pre>
-# Run this script in a python tab
 import json_editor
 json_editor.main()
 </pre>
 
-**From Standlone**
+As a developer you can run this to reload the tool without restarting
+
 <pre>
-[TBD]
+import json_editor
+json_editor.reload_modules()
+json_editor.main(refresh=True)
 </pre>
+
+
 
 

@@ -30,7 +30,7 @@ function SafeRemove
 # Lotsa variables
 $USER_DOWNLOADS_FOLDER = "$env:userprofile\Downloads"
 
-$TOOL_GIT_REPO = "https://github.com/rBrenick/json-editor/archive/master.zip" # modify these after uploading the tool
+$TOOL_GIT_REPO = "https://github.com/rBrenick/json-editor/archive/main.zip" # modify these after uploading the tool
 $UPDATE_PATHS = @("docs", "json_editor", "README.md", "setup.py")
 
 $CURRENT_TOOL_FOLDER = (Get-Item -Path ".").FullName
@@ -97,6 +97,7 @@ SafeRemove $NEW_VERSION_ZIP_FOLDER
 # Update Complete
 echo ""
 echo "Update complete. Please restart Maya"
+
 
 
 

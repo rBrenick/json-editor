@@ -12,3 +12,4 @@ del %UserProfile%\Documents\maya\modules\%json_editor%.mod
 echo .mod file removed from %UserProfile%\Documents\maya\modules\%json_editor%.mod
 
 
+

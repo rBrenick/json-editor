@@ -1,0 +1,6 @@
+class JsonEditorCoreInterface(object):
+    pass
+
+
+
+

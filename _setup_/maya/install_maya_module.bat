@@ -10,9 +10,10 @@ if not exist %UserProfile%\Documents\maya\modules mkdir %UserProfile%\Documents\
 if exist %UserProfile%\Documents\maya\modules\%json_editor%.mod del %UserProfile%\Documents\maya\modules\%json_editor%.mod
 
 :: Create file with contents in users maya/modules folder
-(echo|set /p=+ %json_editor% 1.0 %CD%\_install_ & echo; & echo icons: ..\%CLEAN_json_editor%\icons)>%UserProfile%\Documents\maya\modules\%json_editor%.mod
+(echo|set /p=+ %json_editor% 1.0 %CD%\_setup_\maya & echo; & echo icons: ..\%CLEAN_json_editor%\icons)>%UserProfile%\Documents\maya\modules\%json_editor%.mod
 
 :: end print
 echo .mod file created at %UserProfile%\Documents\maya\modules\%json_editor%.mod
+
 
 
