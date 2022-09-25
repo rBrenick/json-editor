@@ -394,10 +394,13 @@ class JsonEditorWindow(ui_utils.ToolWindow):
         self.setMenuBar(menu_bar)
 
 
-def main(refresh=False):
+def main(file_path=None, refresh=False):
     win = JsonEditorWindow()
     win.main(refresh=refresh)
     win.resize(800, 800)
+    
+    if file_path is not None:
+        win.ui.load_json(file_path)
 
     if standalone_app:
         ui_utils.standalone_app_window = win

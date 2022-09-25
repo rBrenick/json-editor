@@ -8,7 +8,7 @@ setuptools.setup(
     version="0.00.01",
     author="Richard Brenick",
     author_email="RichardBrenick@gmail.com",
-    description="qt tool template",
+    description="JSON Editor written in PySide2",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/rBrenick/json-editor",
