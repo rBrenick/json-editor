@@ -9,6 +9,7 @@ Visual JSON Editor written in PySide2.
 
 New features:
 - Can be run in a standalone python interpreter
+    - compiled .exe can be found in [releases](https://github.com/rBrenick/json-editor/releases)
 - Separated out the data_tree widget to its own thing
 - Better handling of different data structures
 - Remember indentation when saving file
